@@ -1,3 +1,3 @@
-const { sendMenu } = require('./src/chat');
+const { sendMenu, sendStatisticResult } = require('./src/chat');
 
-sendMenu();
+sendStatisticResult();

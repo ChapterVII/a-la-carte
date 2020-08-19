@@ -14,4 +14,29 @@ exports.saveMenuFile = (data) => {
       console.error(err);
     }
   })
-}
+};
+
+exports.readMenuFile = () => {
+  const data = fs.readFileSync(MenuJsonPath);
+  if (data) {
+    return JSON.parse(data);
+  }
+};
+
+const orderJsonPath = path.resolve(__dirname, '../../db/order.json');
+
+exports.saveOrderFile = (data) => {
+  const newData = JSON.stringify(data, '', '\t');
+  fs.writeFile(orderJsonPath, newData, (err) => {
+    if (err) {
+      console.error(err);
+    }
+  })
+};
+
+exports.readOrderFile = () => {
+  const data = fs.readFileSync(orderJsonPath);
+  if (data) {
+    return JSON.parse(data);
+  }
+};
