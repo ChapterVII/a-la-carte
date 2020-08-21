@@ -4,6 +4,9 @@ const initial = require('../commands/initial');
 const admin = require('../commands/admin');
 const order = require('../commands/order');
 const statistic = require('../commands/statistic');
+const {mkdirDb} = require('../src/utils');
+
+mkdirDb();
 
 program
   .version('0.0.1')

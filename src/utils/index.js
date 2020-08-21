@@ -2,6 +2,15 @@ const path = require('path');
 const fs = require('fs');
 const moment = require('moment');
 
+const dbPath = path.resolve(__dirname, '../../db');
+
+exports.mkdirDb = () => {
+  if (fs.existsSync(dbPath)) {
+    return;
+  }
+  fs.mkdirSync(dbPath);
+}
+
 const today = moment().format('YYYY-MM-DD');
 exports.today = today;
 
@@ -19,6 +28,9 @@ exports.saveMenuFile = (data) => {
 };
 
 const readMenuFile = () => {
+  if (!fs.existsSync(MenuJsonPath)) {
+    return;
+  }
   const data = fs.readFileSync(MenuJsonPath);
   if (data) {
     return JSON.parse(data);
@@ -65,6 +77,9 @@ exports.saveOrderFile = (data) => {
 };
 
 exports.readOrderFile = () => {
+  if (!fs.existsSync(orderJsonPath)) {
+    return;
+  }
   const data = fs.readFileSync(orderJsonPath);
   if (data) {
     return JSON.parse(data);
@@ -89,6 +104,9 @@ exports.saveConfigFile = (data) => {
 };
 
 exports.readConfigFile = () => {
+  if (!fs.existsSync(configPath)) {
+    return;
+  }
   const data = fs.readFileSync(configPath);
   if (data) {
     return JSON.parse(data);
@@ -109,6 +127,9 @@ exports.saveAdminFile = (data) => {
 };
 
 exports.readAdminFile = () => {
+  if (!fs.existsSync(adminPath)) {
+    return;
+  }
   const data = fs.readFileSync(adminPath);
   if (data) {
     return JSON.parse(data);

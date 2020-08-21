@@ -1,6 +1,6 @@
 {
-  "name": "a-la-carte",
-  "version": "1.0.0",
+  "name": "@chaptervii/alacarte",
+  "version": "1.0.4",
   "description": "团队点餐，统计的工具",
   "main": "main.js",
   "bin": {
@@ -29,3 +29,5 @@
   },
   "homepage": "https://github.com/ChapterVII/a-la-carte#README"
 }
+
+
