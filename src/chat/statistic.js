@@ -1,21 +1,6 @@
 const { sendTextMsg, sendMarkdownMsg } = require('../api/robot');
-const { readMenuFile } = require('../utils');
+const { getMenuList, readAdminFile } = require('../utils');
 const { getTeamOrderList } = require('../order');
-const { admin } = require('../../administrator');
-
-const getMenuList = () => {
-  const menuList = [];
-  const menuData = readMenuFile();
-  Object.keys(menuData).forEach(restaurant => {
-    const menus = menuData[restaurant];
-    if (menus && menus.length) {
-      menus.forEach(m => {
-        menuList.push(m.name);
-      })
-    }
-  })
-  return menuList;
-}
 
 const getFoodCountMap = (foodList) => {
   const menuList = getMenuList();
@@ -53,11 +38,16 @@ const formatStatisticData = (data, sum) => {
 
 const sendStatisticMsg = async (content) => {
   console.log('企业微信机器人发送 \n', content);
+  const admin = readAdminFile();
+  if (!admin || !admin.id) {
+    return;
+  }
+  const { id } = admin;
   const { markdown, text } = content;
   if (!markdown) {
     sendTextMsg({
       content: text,
-      mentioned_list: [admin],
+      mentioned_list: [id],
     });
     return;
   }
@@ -66,7 +56,7 @@ const sendStatisticMsg = async (content) => {
   if (response.errcode === 0) {
     sendTextMsg({
       content: '',
-      mentioned_list :[admin],
+      mentioned_list :[id],
     });
   }
 }

@@ -1,20 +1,30 @@
 const axios = require('../http');
-const { order } = require('../../config');
-const { members } = require('../../administrator');
-const { today } =require('../utils');
+const { today, readConfigFile, readAdminFile } =require('../utils');
 
-const {baseUrl, commonPath, area, dept, version} = order;
-
-const PATH_MAP = {
-  ADD: `${baseUrl}${commonPath}add`,
-  DELETE: `${baseUrl}${commonPath}delete`,
-  LIST: `${baseUrl}${commonPath}list`,
+exports.queryConfig = (orderConfig) => {
+  if (!orderConfig) {
+    const config = readConfigFile();
+    if (!config || !config.order) {
+      return;
+    }
+    orderConfig = config.order;
+  }
+  const { baseUrl, commonPath } = orderConfig;
+  return axios({
+    method: "get",
+    url: `${baseUrl}${commonPath}config`,
+  });
 };
 
 exports.addOrder = (data) => {
+  const config = readConfigFile();
+  if (!config || !config.order) {
+    return;
+  }
+  const { baseUrl, commonPath, area, dept, version } = config.order;
   return axios({
     method: "post",
-    url: PATH_MAP.ADD,
+    url: `${baseUrl}${commonPath}add`,
     params: {
       area,
       dept,
@@ -26,9 +36,14 @@ exports.addOrder = (data) => {
 };
 
 exports.delOrder = (id) => {
+  const config = readConfigFile();
+  if (!config || !config.order) {
+    return;
+  }
+  const { baseUrl, commonPath, version } = config.order;
   return axios({
     method: "get",
-    url: PATH_MAP.DELETE,
+    url: `${baseUrl}${commonPath}delete`,
     params: {
       id,
       gpclVersion: version,
@@ -37,9 +52,14 @@ exports.delOrder = (id) => {
 };
 
 const queryOrderList = () => {
+  const config = readConfigFile();
+  if (!config || !config.order) {
+    return;
+  }
+  const { baseUrl, commonPath, version } = config.order;
   return axios({
     method: "get",
-    url: PATH_MAP.LIST,
+    url: `${baseUrl}${commonPath}list`,
     params: {
       pageNum: 1,
       pageSize: 1000,
@@ -57,7 +77,10 @@ exports.queryTeamOrderList = async () => {
     if (res.list.length === 0) {
       return [];
     } else {
-      return res.list.filter(i => i.dept === dept && members.includes(i.name));
+      const admin = readAdminFile();
+      if (admin && admin.members) {
+        return res.list.filter(i => i.dept === dept && members.includes(i.name));
+      }
     }
   }
   console.error('Get Team OrderList Faild!');

@@ -1,13 +1,9 @@
 const axios = require('../http');
-const { admin, robot } = require('../../administrator');
+const { readAdminFile } =require('../utils');
 
 const sendMsg = (data) => {
-  if (!admin) {
-    console.error('Please apply for administrator permission first!');
-    return;
-  }
-  if (!robot || !robot.URL) {
-    console.error('cannot find your robot webHook!');
+  const admin = readAdminFile();
+  if (!admin || !admin.robot) {
     return;
   }
   return axios({
@@ -15,7 +11,7 @@ const sendMsg = (data) => {
     headers: {
       "Content-Type": "application/json"
     },
-    url: robot.URL,
+    url: admin.robot,
     data,
   });
 }

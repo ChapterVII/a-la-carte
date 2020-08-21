@@ -1,12 +1,17 @@
 const axios = require('../http');
-const { menu } = require('../../config');
-const { today, meicanEndTime } = require('../utils');
+const { today, meicanEndTime, checkConfigExist, readConfigFile } = require('../utils');
 
 const BaseUrl = 'https://meican.com/preorder/api/v2.1/';
 
-const CommonHeaders = {
-  'Content-Type': 'application/x-www-form-urlencoded',
-  'cookie': menu.cookie,
+const getCommonHeaders = () => {
+  const config = readConfigFile();
+  if (!config || !config.menu) {
+    return;
+  }
+  return {
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'cookie': config.menu.cookie,
+  }
 };
 
 const PATH_MAP = {
@@ -18,7 +23,7 @@ const PATH_MAP = {
 exports.queryCalendaritemsList = () => {
   return axios({
     method: "get",
-    headers: CommonHeaders,
+    headers: getCommonHeaders(),
     url: `${BaseUrl}${PATH_MAP.CalendaritemsList}`,
     params: {
       withOrderDetail: false,
@@ -31,7 +36,7 @@ exports.queryCalendaritemsList = () => {
 exports.queryRestaurantsList = (tabUniqueId) => {
   return axios({
     method: "get",
-    headers: CommonHeaders,
+    headers: getCommonHeaders(),
     url: `${BaseUrl}${PATH_MAP.RestaurantsList}`,
     params: {
       tabUniqueId,
@@ -44,7 +49,7 @@ exports.queryRestaurantDetail = (data) => {
   const { tabUniqueId, restaurantUniqueId } = data;
   return axios({
     method: "get",
-    headers: CommonHeaders,
+    headers: getCommonHeaders(),
     url: `${BaseUrl}${PATH_MAP.RestaurantsDetail}`,
     params: {
       tabUniqueId,

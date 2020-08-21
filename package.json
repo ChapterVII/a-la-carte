@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "团队点餐，统计的工具",
   "main": "main.js",
+  "bin": {
+    "alacarte": "./bin/index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node main.js"
@@ -16,7 +19,10 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.19.2",
-    "moment": "^2.27.0"
+    "commander": "^6.0.0",
+    "inquirer": "^7.3.3",
+    "moment": "^2.27.0",
+    "ora": "^5.0.0"
   },
   "bugs": {
     "url": "https://github.com/ChapterVII/a-la-carte/issues"

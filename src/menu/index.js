@@ -1,6 +1,6 @@
 const axios = require('../http');
 const { queryCalendaritemsList, queryRestaurantsList, queryRestaurantDetail } = require('../api/menu');
-const { saveMenuFile } = require('../utils');
+const { saveMenuFile, today } = require('../utils');
 
 const getTabUniqueId = async () => {
   const res = await queryCalendaritemsList();
@@ -70,6 +70,9 @@ exports.getMenus = async () => {
   });
   if (!menuMap) return;
   
-  saveMenuFile(menuMap);
+  saveMenuFile({
+    date: today,
+    ...menuMap,
+  });
   return menuMap;
 }

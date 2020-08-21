@@ -1,9 +1,34 @@
-const { addOrder, delOrder, queryTeamOrderList } = require('../api/order');
-const { order } = require('../../config');
-const { saveOrderFile, readOrderFile, today } = require('../utils');
+const { queryConfig, addOrder, delOrder, queryTeamOrderList } = require('../api/order');
+const { saveOrderFile, readOrderFile, today, requiredConfigItems, readConfigFile } = require('../utils');
+
+exports.getConfig = async (orderConfig) => {
+  try {
+    const res = await queryConfig(orderConfig);
+    if (res && res.retCode === 0 && res.gpclConfig && res.gpclConfig.fields) {
+      // console.log('订餐平台配置查询成功: ', res);
+      const config = {version: res.gpclVersion};
+      res.gpclConfig.fields.forEach(i => {
+        if (requiredConfigItems.includes(i.name)) {
+          config[i.name] = {
+            label: i.label,
+            options: i.dict.values,
+          }
+        }
+      })
+      return config;
+    }
+    console.error('订餐平台配置查询失败: ', res);
+  } catch(e) {
+  }
+  return;
+}
 
 exports.createOrder = async (food) => {
-  const { name, company } = order;
+  const config = readConfigFile();
+  if (!config || !config.order) {
+    return;
+  }
+  const { name, company } = config.order;
   const res = await addOrder({
     name,
     company,
