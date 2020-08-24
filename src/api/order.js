@@ -73,14 +73,11 @@ const queryOrderList = () => {
 
 exports.queryTeamOrderList = async () => {
   const res = await queryOrderList();
-  if (res && res.list) {
-    if (res.list.length === 0) {
-      return [];
-    } else {
-      const admin = readAdminFile();
-      if (admin && admin.members) {
-        return res.list.filter(i => i.dept === dept && members.includes(i.name));
-      }
+  if (res && res.list && res.list.length) {
+    const admin = readAdminFile();
+    if (admin && admin.members) {
+      const { members, dept} = admin;
+      return res.list.filter(i => Number(i.dept) === dept && members.includes(i.name));
     }
   }
   console.error('Get Team OrderList Faild!');
