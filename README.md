@@ -28,8 +28,16 @@ npm install -g @chaptervii/alacarte
 
 ```sh
 npm init // 生成项目配置文件
-
 npm order // 订餐
+npm notify // 通知订餐
+npm notify --enable // 开启订餐通知定时任务
+npm notify --disable // 关闭订餐通知定时任务
+npm notify --enable --twice // 开启订餐（only二次）通知定时任务
+npm notify --disable --twice // 关闭订餐（only二次）通知定时任务
+npm admin // 生成管理员配置文件
+npm statistic // 订餐统计
+npm notify --statistic --enable // 开启自动推送统计结果的定时任务
+npm notify --statistic --disable // 开启自动推送统计结果的定时任务
 ```
 
 ## Author
