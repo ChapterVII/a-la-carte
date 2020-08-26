@@ -135,3 +135,31 @@ exports.readAdminFile = () => {
     return JSON.parse(data);
   }
 };
+
+const defaultMotifyIconPath = path.resolve(__dirname, `../../images/notify-icon.jpg`);
+const notifyIconPath = path.resolve(__dirname, `../../images/notify-icon-${today}.jpg`);
+
+exports.saveNotifyIcon = data => new Promise((resolve) => {
+  try {
+    const stream = data.pipe(fs.createWriteStream(notifyIconPath));
+    stream.on('finish', function () {
+      resolve('success');
+    });
+  } catch (e) {
+    console.log('图片保存失败：: ', e);
+    resolve('failed');
+  }
+});
+
+const checkTodayNotifyIcon = () => {
+  return fs.existsSync(notifyIconPath);
+}
+
+exports.checkTodayNotifyIcon = checkTodayNotifyIcon;
+
+exports.getValidNotifyIconPath = () => {
+  if (checkTodayNotifyIcon()) {
+    return notifyIconPath;
+  }
+  return defaultMotifyIconPath;
+};
