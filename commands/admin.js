@@ -51,7 +51,7 @@ const promptSelectInfo = (config) => new Promise(resolve => {
   const promptList = ['dept'].map(i => {
     const {label, options} = config[i];
     return {
-      type: 'rawlist',
+      type: 'list',
       message: `请选择 ${label}`,
       name: i,
       choices: options.map(v => ({

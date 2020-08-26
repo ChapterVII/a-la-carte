@@ -1,6 +1,6 @@
 const inquirer = require('inquirer');
 const ora = require('ora');
-const { getMenuList, checkConfigExist, checkTodayMenuCached } = require('../src/utils');
+const { renderMenuChoice, checkConfigExist, checkTodayMenuCached } = require('../src/utils');
 const { createOrder } = require('../src/order');
 const { getMenus } = require('../src/menu');
 
@@ -11,12 +11,12 @@ module.exports = async () => {
   }
   let menus;
   if (checkTodayMenuCached()) {
-    menus = getMenuList();
+    menus = renderMenuChoice();
   } else {
     const spinner = ora('获取菜单...');
     spinner.start();
     const menuMap = await getMenus();
-    menus = getMenuList(menuMap);
+    menus = renderMenuChoice(menuMap);
     spinner.succeed();
   }
   inquirer
@@ -25,6 +25,7 @@ module.exports = async () => {
       name: 'food',
       message: 'Please choose your dish',
       choices: menus,
+      pageSize: 20,
     })
     .then(answers => {
       if (answers && answers.food) {

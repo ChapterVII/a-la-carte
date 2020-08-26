@@ -1,6 +1,8 @@
 const path = require('path');
 const fs = require('fs');
 const moment = require('moment');
+const inquirer = require('inquirer');
+const chalk = require('chalk');
 
 const dbPath = path.resolve(__dirname, '../../db');
 
@@ -47,11 +49,10 @@ exports.checkTodayMenuCached = () => {
   return false;
 }
 
-exports.getMenuList = (menuMap) => {
+exports.getMenuList = () => {
+  const menuMap = readMenuFile();
+  if (!menuMap) return;
   const menuList = [];
-  if (!menuMap) {
-    menuMap = readMenuFile();
-  }
   Object.keys(menuMap).forEach(key => {
     if (key !== 'date') {
       const menus = menuMap[key];
@@ -63,6 +64,27 @@ exports.getMenuList = (menuMap) => {
     }
   })
   return menuList;
+}
+
+exports.renderMenuChoice = (menuMap) => {
+  const choice = [];
+  if (!menuMap) {
+    menuMap = readMenuFile();
+  }
+  Object.keys(menuMap).forEach(key => {
+    if (key !== 'date') {
+      const menus = menuMap[key];
+      if (menus && menus.length) {
+        menus.forEach((m, i) => {
+          if (i === 0) {
+            choice.push(new inquirer.Separator(chalk.bgWhite.black(`【${(key)}】 \n`)));
+          }
+          choice.push(`${chalk.cyan(m.name)} \n`);
+        });
+      }
+    }
+  })
+  return choice;
 }
 
 const orderJsonPath = path.resolve(__dirname, '../../db/order.json');

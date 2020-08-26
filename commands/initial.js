@@ -13,7 +13,7 @@ const promptInputInfo = () => new Promise(resolve => {
         return "请输入中文姓名";
       }
       return true;
-  }
+    }
   },{
     type: 'input',
     message: 'Please enter your cookie:',
@@ -42,7 +42,7 @@ const promptSelectInfo = (config) => new Promise(resolve => {
   const promptList = requiredConfigItems.map(i => {
     const {label, options} = config[i];
     return {
-      type: 'rawlist',
+      type: 'list',
       message: `请选择 ${label}`,
       name: i,
       choices: options.map(v => ({
@@ -93,6 +93,7 @@ module.exports = async () => {
       version: config.version,
     }
   };
+  console.log(obj);
   saveConfigFile(obj);
   inquirer
     .prompt([{
