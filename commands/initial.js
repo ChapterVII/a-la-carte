@@ -51,7 +51,6 @@ const promptSelectInfo = (config) => new Promise(resolve => {
       })),
     };
   });
-
   inquirer
     .prompt(promptList)
     .then(answers => {
@@ -95,6 +94,23 @@ module.exports = async () => {
     }
   };
   saveConfigFile(obj);
+  inquirer
+    .prompt([{
+      type: 'confirm',
+      message: '是否开启订餐提醒？',
+      name: 'notify',
+      default: true,
+    }])
+    .then(answers => {
+      if (answers && answers.notify) {
+        const { scheduleOrderNotify, scheduleOrderTwiceNotify } = require('./scheduler');
+        scheduleOrderNotify();
+        scheduleOrderTwiceNotify();
+      }
+    })
+    .catch(error => {
+      console.error('error: ', error);
+    });
 }
 
 

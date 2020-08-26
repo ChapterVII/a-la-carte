@@ -97,6 +97,22 @@ module.exports = async () => {
     ...selectInfo,
   };
   saveAdminFile(obj);
+  inquirer
+    .prompt([{
+      type: 'confirm',
+      message: '是否开启订餐统计自动推送？',
+      name: 'notify',
+      default: true,
+    }])
+    .then(answers => {
+      if (answers && answers.notify) {
+        const { scheduleStatisticNotify } = require('./scheduler');
+        scheduleStatisticNotify();
+      }
+    })
+    .catch(error => {
+      console.error('error: ', error);
+    });
 }
 
 

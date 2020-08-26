@@ -77,7 +77,7 @@ exports.queryTeamOrderList = async () => {
     const admin = readAdminFile();
     if (admin && admin.members) {
       const { members, dept} = admin;
-      return res.list.filter(i => Number(i.dept) === dept && members.includes(i.name));
+      return res.list.filter(i => Number(i.dept) === dept && members.split(' ').includes(i.name));
     }
   }
   console.error('Get Team OrderList Faild!');
