@@ -22,19 +22,19 @@ const promptInputInfo = () => new Promise(resolve => {
     type: 'input',
     message: 'Please enter your robot',
     name: 'robot',
-  },{
-    type: 'input',
-    message: 'Please enter team members',
-    name: 'members',
-    validate: (val) => {
-      const arr = val.split(' ');
-      for (let i = 0; i < arr.length; i++) {
-        if (!/^[\u4e00-\u9fa5]{2,}$/.test(arr[i])) {
-          return "格式错误";
-        }
-      }
-      return true;
-    }
+  // },{
+  //   type: 'input',
+  //   message: 'Please enter team members',
+  //   name: 'members',
+  //   validate: (val) => {
+  //     const arr = val.split(' ');
+  //     for (let i = 0; i < arr.length; i++) {
+  //       if (!/^[\u4e00-\u9fa5]{2,}$/.test(arr[i])) {
+  //         return "格式错误";
+  //       }
+  //     }
+  //     return true;
+  //   }
   }];
   inquirer
     .prompt(promptList)
