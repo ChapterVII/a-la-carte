@@ -9,7 +9,7 @@ const notifyStatisticPath = path.resolve(__dirname, './statistic.js');
 
 
 const TIME_MAP = {
-  ORDER_NOTIFY: '10:00:00',
+  ORDER_NOTIFY: '10:30:00',
   ORDER_TWICE_NOTIFY: '13:45:00',
   STATISTIC_NOTIFY: '17:30:00',
 }
