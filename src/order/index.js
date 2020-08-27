@@ -7,7 +7,6 @@ exports.getConfig = async (orderConfig) => {
   try {
     const res = await queryConfig(orderConfig);
     if (res && res.retCode === 0 && res.gpclConfig && res.gpclConfig.fields) {
-      // console.log('订餐平台配置查询成功: ', res);
       const config = {version: res.gpclVersion};
       res.gpclConfig.fields.forEach(i => {
         if (requiredConfigItems.includes(i.name)) {
@@ -42,11 +41,12 @@ exports.createOrder = (food) => {
       food,
     });
     if (res && res.retCode === 0) {
+      console.log('res: ', res);
       saveOrderFile({
         id: res.newId,
         date: today,
       });
-      spinner.succeed('订餐平台下单成功, 新增订单ID: ', res.newId);
+      spinner.succeed(`订餐平台下单成功, 新增订单ID: ${res.newId}`);
     } else {
       spinner.fail(`订餐平台下单失败! ${res && res.retMsg ? res.retMsg : ''}`);
     }
@@ -66,7 +66,10 @@ exports.deleteOrder = async () => {
   if (res && res.retCode === 0) {
     console.log('删除成功: ', data.id);
     saveOrderFile({});
+    return true;
   }
+  console.log(res && res.retMsg ? res.retMsg : '删除失败！');
+  return;
 }
 
 exports.getTeamOrderList = async () => {

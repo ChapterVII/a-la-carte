@@ -26,6 +26,8 @@ program
 program
   .command('order')
   .description('查看菜单并点餐')
+  .option('--update', '修改今日订餐')
+  .option('--delete', '删除今日订餐')
   .action(order);
 
 program
@@ -41,11 +43,11 @@ program
 
 program
   .command('notify')
+  .description('订餐通知')
   .option('--enable', '开启订餐通知', )
   .option('--disable', '关闭订餐通知')
   .option('--twice', '订餐二次提醒')
   .option('--statistic', '订餐统计定时发送')
-  .description('订餐通知')
   .action((arg) => {
     if (arg.twice) {
       if (arg.enable) {

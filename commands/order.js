@@ -2,14 +2,10 @@ const inquirer = require('inquirer');
 const ora = require('ora');
 const chalk = require('chalk');
 const { renderMenuChoice, checkConfigExist, checkTodayMenuCached, mayIOrder } = require('../src/utils');
-const { createOrder } = require('../src/order');
+const { createOrder, deleteOrder } = require('../src/order');
 const { getMenus } = require('../src/menu');
 
-module.exports = async () => {
-  if (!checkConfigExist()) {
-    console.error('配置文件缺失，请执行alacarte init后再订餐');
-    return;
-  }
+const createOrderCommand = async () => {
   const result = await mayIOrder();
   if (!result.status) {
     console.error(chalk.red(result.msg));
@@ -45,6 +41,31 @@ module.exports = async () => {
     .catch(error => {
       console.error('error: ', error);
     })
+}
+
+const updateOrder = async () => {
+  const res = await deleteOrder();
+  if (res === true) {
+    createOrderCommand();
+  }
+}
+
+module.exports = (arg) => {
+  if (!checkConfigExist()) {
+    console.error('配置文件缺失，请执行alacarte init后再订餐');
+    return;
+  }
+  if (arg.delete) {
+    deleteOrder();
+    return;
+  }
+
+  if (arg.update) {
+    updateOrder();
+    return;
+  }
+
+  createOrderCommand();
 }
 
 
