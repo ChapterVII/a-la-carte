@@ -158,12 +158,28 @@ exports.readAdminFile = () => {
 };
 
 const defaultMotifyIconPath = path.resolve(__dirname, `../../images/notify-icon.jpg`);
-const notifyIconPath = path.resolve(__dirname, `../../images/notify-icon-${today}.jpg`);
+const notifyIconName = `notify-icon-${today}.jpg`;
+const notifyIconPath = path.resolve(__dirname, `../../images/${notifyIconName}`);
+
+const removeInvalidNotifyIcon = () => {
+  const dirPath = path.resolve(__dirname, `../../images`);
+  if( fs.existsSync(dirPath) ) {
+    const files = fs.readdirSync(dirPath);
+    files.forEach((file) => {
+      if (file !== 'notify-icon.jpg' && file !== notifyIconName) {
+        fs.unlink(path.join(dirPath, file), (err) => {
+          console.log(`notifyIcon: ${file} 删除${err ? '失败 ' + err : '成功'}`);
+        });
+      }
+    })
+  }
+}
 
 exports.saveNotifyIcon = data => new Promise((resolve) => {
   try {
     const stream = data.pipe(fs.createWriteStream(notifyIconPath));
     stream.on('finish', function () {
+      removeInvalidNotifyIcon();
       resolve('success');
     });
   } catch (e) {
