@@ -79,7 +79,7 @@ exports.renderMenuChoice = (menuMap) => {
           if (i === 0) {
             choice.push(new inquirer.Separator(chalk.bgWhite.black(`【${(key)}】 \n`)));
           }
-          choice.push(`${chalk.cyan(m.name)} \n`);
+          choice.push(`${m.name} \n`);
         });
       }
     }
@@ -91,11 +91,7 @@ const orderJsonPath = path.resolve(__dirname, '../../db/order.json');
 
 exports.saveOrderFile = (data) => {
   const newData = JSON.stringify(data, '', '\t');
-  fs.writeFile(orderJsonPath, newData, (err) => {
-    if (err) {
-      console.error(err);
-    }
-  })
+  fs.writeFileSync(orderJsonPath, newData);
 };
 
 exports.readOrderFile = () => {

@@ -1,3 +1,5 @@
+
+const ora = require('ora');
 const { queryConfig, addOrder, delOrder, queryTeamOrderList } = require('../api/order');
 const { saveOrderFile, readOrderFile, today, requiredConfigItems, readConfigFile } = require('../utils');
 
@@ -23,25 +25,36 @@ exports.getConfig = async (orderConfig) => {
   return;
 }
 
-exports.createOrder = async (food) => {
-  const config = readConfigFile();
-  if (!config || !config.order) {
-    return;
-  }
-  const { name, company } = config.order;
-  const res = await addOrder({
-    name,
-    company,
-    bookDate: today,
-    food,
-  });
-  if (res && res.retCode === 0) {
-    console.log('订餐平台下单成功, 新增订单ID: ', res.newId);
-    saveOrderFile({
-      id: res.newId,
-      date: today,
+exports.createOrder = (food) => {
+  return new Promise(async (resolve) => {
+    const config = readConfigFile();
+    if (!config || !config.order) {
+      return;
+    }
+    const { name, company } = config.order;
+    
+    const spinner = ora('正在下单...');
+    spinner.start();
+    const res = await addOrder({
+      name,
+      company,
+      bookDate: today,
+      food,
     });
-  }
+    if (res && res.retCode === 0) {
+      console.log('订餐平台下单成功, 新增订单ID: ', res.newId);
+      saveOrderFile({
+        id: res.newId,
+        date: today,
+      });
+      spinner.succeed('订餐平台下单成功, 新增订单ID: ', res.newId);
+    } else {
+      spinner.fail(`订餐平台下单失败! ${res && res.retMsg ? res.retMsg : ''}`);
+    }
+    setTimeout(() => {
+      resolve();
+    }, 3000);
+  })
 }
 
 exports.deleteOrder = async () => {

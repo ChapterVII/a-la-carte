@@ -27,10 +27,10 @@ module.exports = async () => {
       choices: menus,
       pageSize: 20,
     })
-    .then(answers => {
+    .then(async (answers) => {
       if (answers && answers.food) {
         const [validFoodName] = answers.food.split('(');
-        createOrder(validFoodName);
+        await createOrder(validFoodName);
       }
     })
     .catch(error => {
