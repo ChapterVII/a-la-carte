@@ -1,12 +1,13 @@
 const inquirer = require('inquirer');
 const ora = require('ora');
+const { getUserConfig } = require('../src/api/common');
 const { getConfig } = require('../src/order');
 const { requiredConfigItems, saveConfigFile } = require('../src/utils');
 
 const promptInputInfo = () => new Promise(resolve => {
   const promptList = [{
     type: 'input',
-    message: '请输入姓名（中文）',
+    message: 'Please enter your name (Chinese): ',
     name: 'name',
     validate: (val) => {
       if (!/^[\u4e00-\u9fa5]{2,}$/.test(val)) {
@@ -16,16 +17,8 @@ const promptInputInfo = () => new Promise(resolve => {
     }
   },{
     type: 'input',
-    message: 'Please enter your cookie:',
-    name: 'cookie',
-  },{
-    type: 'input',
-    message: 'Please enter baseUrl:',
-    name: 'baseUrl',
-  },{
-    type: 'input',
-    message: 'Please enter commonPath:',
-    name: 'commonPath',
+    message: 'Please enter server:',
+    name: 'server',
   }];
   inquirer
     .prompt(promptList)
@@ -68,33 +61,44 @@ module.exports = async () => {
     return;
   }
 
-  const spinner = ora('拉取配置选项...');
+  const { name, server } = inputInfo;
+
+  const spinner = ora('拉取配置项...');
   spinner.start();
-  const config = await getConfig(inputInfo);
-  spinner.succeed();
-  if (!config) {
-    console.error('Failed!');
+
+  const userConfig = await getUserConfig(server);
+  if (!userConfig) {
+    spinner.fail('配置项userConfig拉取失败！');
+    return;
+  }
+  
+  const orderConfig = await getConfig(userConfig);
+  if (!orderConfig) {
+    spinner.fail('配置项orderConfig拉取失败！');
     return;
   }
 
-  const selectInfo = await promptSelectInfo(config);
+  spinner.succeed('配置项拉取完成');
+
+  const selectInfo = await promptSelectInfo(orderConfig);
   if (!selectInfo) {
     return;
   }
-
-  const { cookie, ...rest } = inputInfo;
+  const { cookie, ...rest } = userConfig;
   const obj = {
     menu: {
       cookie,
     },
+    server,
     order: {
+      name,
       ...rest,
       ...selectInfo,
-      version: config.version,
+      version: orderConfig.version,
     }
   };
-  console.log(obj);
   saveConfigFile(obj);
+
   inquirer
     .prompt([{
       type: 'confirm',

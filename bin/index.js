@@ -6,6 +6,7 @@ const order = require('../commands/order');
 const statistic = require('../commands/statistic');
 const scheduler = require('../commands/scheduler');
 const notify = require('../commands/notify');
+const server = require('../commands/server');
 const {mkdirDb} = require('../src/utils');
 
 mkdirDb();
@@ -31,6 +32,11 @@ program
   .command('statistic')
   .description('统计每日每餐订餐人数')
   .action(statistic);
+
+program
+  .command('server')
+  .description('同步配置信息服务')
+  .action(server);
   
 
 program

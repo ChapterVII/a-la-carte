@@ -1,6 +1,6 @@
 /node_modules
 /db
-config.js
+config.json
 administrator.js
 package-lock.json
 alacarte.admin.json
