@@ -42,7 +42,6 @@ exports.createOrder = (food) => {
       food,
     });
     if (res && res.retCode === 0) {
-      console.log('订餐平台下单成功, 新增订单ID: ', res.newId);
       saveOrderFile({
         id: res.newId,
         date: today,

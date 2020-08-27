@@ -1,18 +1,7 @@
 const axios = require('../http');
-const { today, meicanEndTime, checkConfigExist, readConfigFile } = require('../utils');
+const { today, meicanEndTime, getCommonHeaders } = require('../utils');
 
 const BaseUrl = 'https://meican.com/preorder/api/v2.1/';
-
-const getCommonHeaders = () => {
-  const config = readConfigFile();
-  if (!config || !config.menu) {
-    return;
-  }
-  return {
-    'Content-Type': 'application/x-www-form-urlencoded',
-    'cookie': config.menu.cookie,
-  }
-};
 
 const PATH_MAP = {
   CalendaritemsList: 'calendaritems/list',
@@ -20,15 +9,16 @@ const PATH_MAP = {
   RestaurantsDetail: 'restaurants/show',
 };
 
-exports.queryCalendaritemsList = () => {
+exports.queryCalendaritemsList = (headers, data) => {
   return axios({
     method: "get",
-    headers: getCommonHeaders(),
+    headers: headers || getCommonHeaders(),
     url: `${BaseUrl}${PATH_MAP.CalendaritemsList}`,
     params: {
       withOrderDetail: false,
       beginDate: today,
       endDate: today,
+      ...data,
     },
   });
 };

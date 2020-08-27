@@ -3,6 +3,7 @@ const fs = require('fs');
 const moment = require('moment');
 const inquirer = require('inquirer');
 const chalk = require('chalk');
+const { queryCalendaritemsList } = require('../api/menu');
 
 const dbPath = path.resolve(__dirname, '../../db');
 
@@ -121,7 +122,7 @@ exports.saveConfigFile = (data) => {
   })
 };
 
-exports.readConfigFile = () => {
+const readConfigFile = () => {
   if (!fs.existsSync(configPath)) {
     return;
   }
@@ -130,6 +131,8 @@ exports.readConfigFile = () => {
     return JSON.parse(data);
   }
 };
+
+exports.readConfigFile = readConfigFile;
 
 const adminPath = path.resolve(__dirname, '../../alacarte.admin.json');
 exports.adminPath = adminPath;
@@ -181,3 +184,74 @@ exports.getValidNotifyIconPath = () => {
   }
   return defaultMotifyIconPath;
 };
+
+const getCommonHeaders = () => {
+  const config = readConfigFile();
+  if (!config || !config.menu) {
+    return;
+  }
+  
+  return {
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'cookie': config.menu.cookie,
+  }
+};
+
+exports.getCommonHeaders = getCommonHeaders;
+
+exports.mayIOrder = async () => {
+  const startTime = moment().format("YYYY-MM-DD 10:30:00");
+  const current = moment();
+  const endTime = moment().format("YYYY-MM-DD 15:30:00");
+  const alarmTime = moment().format("YYYY-MM-DD 14:00:00");
+  if (current.isBefore(startTime)) {
+    return {
+      status: false,
+      msg: '来早啦，10:30开始订餐！',
+    };
+  }
+  if (current.isAfter(endTime)) {
+    return {
+      status: false,
+      msg: '来晚咯，商家已收单！',
+    };
+  }
+  if (current.isBefore(alarmTime)) {
+    return {
+      status: true,
+    };
+  }
+  try {
+    const res = await queryCalendaritemsList(getCommonHeaders(), {
+      beginDate: today,
+      endDate: today
+    });
+    if (res && res.dateList && res.dateList[0]) {
+      const targetCalendarItem = res.dateList[0].calendarItemList;
+      if (targetCalendarItem && targetCalendarItem[0] && targetCalendarItem[0].status) {
+        if (targetCalendarItem[0].status === 'AVAILABLE') {
+          return {
+            status: true,
+          }
+        }
+        if (targetCalendarItem[0].status === 'ORDER') {
+          return {
+            status: 'ORDER',
+            msg: '订餐时间过晚，第三方APP已下单，订餐成功后请尽快联系管理员手动增加！',
+          };
+        }
+      }
+    }
+    
+    return {
+      status: false,
+      msg: '获取订餐状态失败，请联系管理员!',
+    };
+  } catch (e) {
+    console.log('error: ', e);
+    return {
+      status: false,
+      msg: '获取订餐状态失败，请联系管理员!',
+    };
+  }
+}
