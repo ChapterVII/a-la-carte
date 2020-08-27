@@ -1,15 +1,15 @@
 
 const ora = require('ora');
-const { queryConfig, addOrder, delOrder, queryTeamOrderList } = require('../api/order');
-const { saveOrderFile, readOrderFile, today, requiredConfigItems, readConfigFile } = require('../utils');
+const orderApi = require('../api/order');
+const utils = require('../utils');
 
 exports.getConfig = async (orderConfig) => {
   try {
-    const res = await queryConfig(orderConfig);
+    const res = await orderApi.queryConfig(orderConfig);
     if (res && res.retCode === 0 && res.gpclConfig && res.gpclConfig.fields) {
       const config = {version: res.gpclVersion};
       res.gpclConfig.fields.forEach(i => {
-        if (requiredConfigItems.includes(i.name)) {
+        if (utils.requiredConfigItems.includes(i.name)) {
           config[i.name] = {
             label: i.label,
             options: i.dict.values,
@@ -26,7 +26,7 @@ exports.getConfig = async (orderConfig) => {
 
 exports.createOrder = (food) => {
   return new Promise(async (resolve) => {
-    const config = readConfigFile();
+    const config = utils.readConfigFile();
     if (!config || !config.order) {
       return;
     }
@@ -34,17 +34,17 @@ exports.createOrder = (food) => {
     
     const spinner = ora('正在下单...');
     spinner.start();
-    const res = await addOrder({
+    const res = await orderApi.addOrder({
       name,
       company,
-      bookDate: today,
+      bookDate: utils.today,
       food,
     });
     if (res && res.retCode === 0) {
       console.log('res: ', res);
-      saveOrderFile({
+      utils.saveOrderFile({
         id: res.newId,
-        date: today,
+        date: utils.today,
       });
       spinner.succeed(`订餐平台下单成功, 新增订单ID: ${res.newId}`);
     } else {
@@ -57,15 +57,15 @@ exports.createOrder = (food) => {
 }
 
 exports.deleteOrder = async () => {
-  const data = readOrderFile();
-  if (!data || data.date !== today) {
+  const data = utils.readOrderFile();
+  if (!data || data.date !== utils.today) {
     console.error('今日未下单！');
     return;
   }
-  const res = await delOrder(data.id);
+  const res = await orderApi.delOrder(data.id);
   if (res && res.retCode === 0) {
     console.log('删除成功: ', data.id);
-    saveOrderFile({});
+    utils.saveOrderFile({});
     return true;
   }
   console.log(res && res.retMsg ? res.retMsg : '删除失败！');
@@ -73,9 +73,13 @@ exports.deleteOrder = async () => {
 }
 
 exports.getTeamOrderList = async () => {
-  const res = await queryTeamOrderList();
+  const res = await orderApi.queryTeamOrderList();
   if (!res || !res.length) {
     return [];
   }
-  return res.map(i => i.food);
+  console.log('getTeamOrderList: ', res);
+  return res.map(i => ({
+    food: i.food,
+    name: i.name,
+  }));
 }

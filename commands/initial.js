@@ -1,8 +1,8 @@
 const inquirer = require('inquirer');
 const ora = require('ora');
-const { getUserConfig } = require('../src/api/common');
-const { getConfig } = require('../src/order');
-const { requiredConfigItems, saveConfigFile } = require('../src/utils');
+const commonApi = require('../src/api/common');
+const order = require('../src/order');
+const utils = require('../src/utils');
 
 const promptInputInfo = () => new Promise(resolve => {
   const promptList = [{
@@ -32,7 +32,7 @@ const promptInputInfo = () => new Promise(resolve => {
 });
 
 const promptSelectInfo = (config) => new Promise(resolve => {
-  const promptList = requiredConfigItems.map(i => {
+  const promptList = utils.requiredConfigItems.map(i => {
     const {label, options} = config[i];
     return {
       type: 'list',
@@ -66,13 +66,13 @@ module.exports = async () => {
   const spinner = ora('拉取配置项...');
   spinner.start();
 
-  const userConfig = await getUserConfig(server);
+  const userConfig = await commonApi.getUserConfig(server);
   if (!userConfig) {
     spinner.fail('配置项userConfig拉取失败！');
     return;
   }
   
-  const orderConfig = await getConfig(userConfig);
+  const orderConfig = await order.getConfig(userConfig);
   if (!orderConfig) {
     spinner.fail('配置项orderConfig拉取失败！');
     return;
@@ -97,7 +97,7 @@ module.exports = async () => {
       version: orderConfig.version,
     }
   };
-  saveConfigFile(obj);
+  utils.saveConfigFile(obj);
 
   inquirer
     .prompt([{

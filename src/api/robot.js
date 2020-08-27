@@ -1,8 +1,8 @@
 const axios = require('../http');
-const { readAdminFile } =require('../utils');
+const utils =require('../utils');
 
 const sendMsg = (data) => {
-  const admin = readAdminFile();
+  const admin = utils.readAdminFile();
   if (!admin || !admin.robot) {
     return;
   }

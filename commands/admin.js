@@ -1,7 +1,7 @@
 const inquirer = require('inquirer');
 const ora = require('ora');
-const { getConfig } = require('../src/order');
-const { saveAdminFile } = require('../src/utils');
+const order = require('../src/order');
+const utils = require('../src/utils');
 
 const promptInputInfo = () => new Promise(resolve => {
   const promptList = [{
@@ -73,6 +73,10 @@ const promptSelectInfo = (config) => new Promise(resolve => {
 });
 
 module.exports = async () => {
+  if (!utils.checkConfigExist()) {
+    console.error('配置文件缺失，请先执行alacarte init');
+    return;
+  }
   const inputInfo = await promptInputInfo();
   if (!inputInfo) {
     return;
@@ -80,7 +84,7 @@ module.exports = async () => {
 
   const spinner = ora('拉取配置选项...');
   spinner.start();
-  const config = await getConfig();
+  const config = await order.getConfig();
   spinner.succeed();
   if (!config) {
     console.error('Failed!');
@@ -96,7 +100,7 @@ module.exports = async () => {
     ...inputInfo,
     ...selectInfo,
   };
-  saveAdminFile(obj);
+  utils.saveAdminFile(obj);
   inquirer
     .prompt([{
       type: 'confirm',

@@ -7,7 +7,7 @@ const statistic = require('../commands/statistic');
 const scheduler = require('../commands/scheduler');
 const notify = require('../commands/notify');
 const server = require('../commands/server');
-const {mkdirDb} = require('../src/utils');
+const { mkdirDb } = require('../src/utils');
 
 mkdirDb();
 

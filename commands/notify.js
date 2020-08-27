@@ -2,21 +2,21 @@ const notifier = require('node-notifier');
 const ora = require('ora');
 const path = require('path');
 const order = require('./order');
-const { getUnsplashImg } = require('../src/api/notify');
-const { checkTodayNotifyIcon, getValidNotifyIconPath } = require('../src/utils/index');
+const notifyApi = require('../src/api/notify');
+const utils = require('../src/utils');
 
 const orderNotifier = async (isTwice) => {
-  if (!checkTodayNotifyIcon()) {
+  if (!utils.checkTodayNotifyIcon()) {
     const spinner = ora('获取icon...');
     spinner.start();
-    await getUnsplashImg();
+    await notifyApi.getUnsplashImg();
     spinner.succeed();
   }
   notifier.notify(
     {
       title: '订餐提醒',
       message: isTwice ? '再不订餐今天就没饭吃咯~' : '叮咚，可以订餐啦！',
-      icon: getValidNotifyIconPath(),
+      icon: utils.getValidNotifyIconPath(),
       sound: true,
       actions: ['Start', 'Close']
     },

@@ -1,5 +1,5 @@
 const axios = require('../http');
-const { saveNotifyIcon } =require('../utils');
+const utils =require('../utils');
 
 exports.getUnsplashImg = () =>{
   return new Promise(resolve => {
@@ -8,7 +8,7 @@ exports.getUnsplashImg = () =>{
       url: 'https://source.unsplash.com/300x300/?food',
       responseType:'stream',
     }).then(async (data) => {
-      const res = await saveNotifyIcon(data);
+      const res = await utils.saveNotifyIcon(data);
       resolve(res);
     }).catch(e => {
       console.log('图片获取失败：', e);

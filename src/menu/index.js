@@ -1,9 +1,9 @@
 const axios = require('../http');
-const { queryCalendaritemsList, queryRestaurantsList, queryRestaurantDetail } = require('../api/menu');
-const { saveMenuFile, today } = require('../utils');
+const menuApi = require('../api/menu');
+const utils = require('../utils');
 
 const getTabUniqueId = async () => {
-  const res = await queryCalendaritemsList();
+  const res = await menuApi.queryCalendaritemsList();
   if (res && res.dateList && res.dateList[0]) {
     const targetCalendarItem = res.dateList[0].calendarItemList;
     if (targetCalendarItem && targetCalendarItem[0] && targetCalendarItem[0].userTab) {
@@ -16,7 +16,7 @@ const getTabUniqueId = async () => {
 }
 
 const getRestaurantsList = async (tabUniqueId) => {
-  const res = await queryRestaurantsList(tabUniqueId);
+  const res = await menuApi.queryRestaurantsList(tabUniqueId);
   if (res && res.restaurantList && res.restaurantList.length) {
     console.log('获取到的restaurantUniqueIds >>>> ', res.restaurantList.map(i => i.uniqueId));
     return res.restaurantList.map(i => i.uniqueId);
@@ -29,7 +29,7 @@ const getRestaurantsMenus = (data) => new Promise(resolve => {
   const menuMap = {};
   const { tabUniqueId, restaurantUniqueIds } = data;
   axios.all(restaurantUniqueIds.map(restaurantUniqueId => {
-    return queryRestaurantDetail({tabUniqueId, restaurantUniqueId})
+    return menuApi.queryRestaurantDetail({tabUniqueId, restaurantUniqueId})
   })).then(axios.spread((...args) => {
     if (args && args.length) {
       args.forEach((arg) => {
@@ -70,8 +70,8 @@ exports.getMenus = async () => {
   });
   if (!menuMap) return;
   
-  saveMenuFile({
-    date: today,
+  utils.saveMenuFile({
+    date: utils.today,
     ...menuMap,
   });
   return menuMap;

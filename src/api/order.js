@@ -1,9 +1,9 @@
 const axios = require('../http');
-const { today, readConfigFile, readAdminFile } =require('../utils');
+const utils =require('../utils');
 
 exports.queryConfig = (orderConfig) => {
   if (!orderConfig) {
-    const config = readConfigFile();
+    const config = utils.readConfigFile();
     if (!config || !config.order) {
       return;
     }
@@ -17,7 +17,7 @@ exports.queryConfig = (orderConfig) => {
 };
 
 exports.addOrder = (data) => {
-  const config = readConfigFile();
+  const config = utils.readConfigFile();
   if (!config || !config.order) {
     return;
   }
@@ -36,7 +36,7 @@ exports.addOrder = (data) => {
 };
 
 exports.delOrder = (id) => {
-  const config = readConfigFile();
+  const config = utils.readConfigFile();
   if (!config || !config.order) {
     return;
   }
@@ -52,7 +52,7 @@ exports.delOrder = (id) => {
 };
 
 const queryOrderList = () => {
-  const config = readConfigFile();
+  const config = utils.readConfigFile();
   if (!config || !config.order) {
     return;
   }
@@ -63,8 +63,8 @@ const queryOrderList = () => {
     params: {
       pageNum: 1,
       pageSize: 1000,
-      bookDate__sd: today,
-      bookDate__ed: today,
+      bookDate__sd: utils.today,
+      bookDate__ed: utils.today,
       gpclVersion: version,
       sourcePage: 'list',
     },
@@ -74,10 +74,11 @@ const queryOrderList = () => {
 exports.queryTeamOrderList = async () => {
   const res = await queryOrderList();
   if (res && res.list && res.list.length) {
-    const admin = readAdminFile();
+    const admin = utils.readAdminFile();
     if (admin && admin.members) {
       const { members, dept} = admin;
-      return res.list.filter(i => Number(i.dept) === dept && members.split(' ').includes(i.name));
+      const names = members.map(m => m.name);
+      return res.list.filter(i => Number(i.dept) === dept && names.includes(i.name));
     }
   }
   console.error('Get Team OrderList Faild!');

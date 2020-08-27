@@ -1,5 +1,5 @@
 const axios = require('../http');
-const { today, meicanEndTime, getCommonHeaders } = require('../utils');
+const utils = require('../utils');
 
 const BaseUrl = 'https://meican.com/preorder/api/v2.1/';
 
@@ -9,16 +9,15 @@ const PATH_MAP = {
   RestaurantsDetail: 'restaurants/show',
 };
 
-exports.queryCalendaritemsList = (headers, data) => {
+exports.queryCalendaritemsList = () => {
   return axios({
     method: "get",
-    headers: headers || getCommonHeaders(),
+    headers: utils.getCommonHeaders(),
     url: `${BaseUrl}${PATH_MAP.CalendaritemsList}`,
     params: {
       withOrderDetail: false,
-      beginDate: today,
-      endDate: today,
-      ...data,
+      beginDate: utils.today,
+      endDate: utils.today,
     },
   });
 };
@@ -26,11 +25,11 @@ exports.queryCalendaritemsList = (headers, data) => {
 exports.queryRestaurantsList = (tabUniqueId) => {
   return axios({
     method: "get",
-    headers: getCommonHeaders(),
+    headers: utils.getCommonHeaders(),
     url: `${BaseUrl}${PATH_MAP.RestaurantsList}`,
     params: {
       tabUniqueId,
-      targetTime: meicanEndTime,
+      targetTime: utils.meicanEndTime,
     },
   });
 };
@@ -39,12 +38,12 @@ exports.queryRestaurantDetail = (data) => {
   const { tabUniqueId, restaurantUniqueId } = data;
   return axios({
     method: "get",
-    headers: getCommonHeaders(),
+    headers: utils.getCommonHeaders(),
     url: `${BaseUrl}${PATH_MAP.RestaurantsDetail}`,
     params: {
       tabUniqueId,
       restaurantUniqueId,
-      targetTime: meicanEndTime,
+      targetTime: utils.meicanEndTime,
     },
   });
 }

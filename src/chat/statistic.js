@@ -1,9 +1,9 @@
 const { sendTextMsg, sendMarkdownMsg } = require('../api/robot');
-const { getMenuList, readAdminFile } = require('../utils');
-const { getTeamOrderList } = require('../order');
+const utils = require('../utils');
+const order = require('../order');
 
 const getFoodCountMap = (foodList) => {
-  const menuList = getMenuList();
+  const menuList = utils.getMenuList();
   const foodMap = {};
   foodList.forEach(i => {
     const menu = menuList.find(m => m.includes(i));
@@ -36,43 +36,68 @@ const formatStatisticData = (data, sum) => {
   return result;
 }
 
-const sendStatisticMsg = async (content) => {
-  console.log('企业微信机器人发送 \n', content);
-  const admin = readAdminFile();
-  if (!admin || !admin.id) {
-    return;
+const chooseMemberIds = (orderList, members, adminId) => {
+  if (Array.isArray(orderList) && orderList.length) {
+    const hasIdList = orderList.filter(i => members.find(m => m.name === i.name).id);
+    const adminName = members.find(m => m.id === adminId).name;
+    const filteredNames = hasIdList.filter(i => i.name !== adminName).map(l => l.name);
+    const l = filteredNames.length;
+    if (l < 3) {
+      const ids = filteredNames.map(n => members.find(m => m.name === n).id);
+      return ids;
+    }
+    const randomIndex1 = Math.floor(Math.random() * l);
+    console.log('randomIndex1: ', randomIndex1, filteredNames[randomIndex1]);
+    const restNames = [...filteredNames];
+    restNames.splice(randomIndex1, 1);
+    const randomIndex2 = Math.floor(Math.random() * restNames.length);
+    console.log('randomIndex2: ', randomIndex2, restNames[randomIndex2]);
+    const randomIds = [filteredNames[randomIndex1], restNames[randomIndex2]].map(n => members.find(m => m.name === n).id);
+    console.log('randomIds: ', randomIds);
+    return randomIds;
   }
-  const { id } = admin;
+  return [];
+}
+
+const sendStatisticMsg = async (content, adminId, memberIds) => {
   const { markdown, text } = content;
   if (!markdown) {
     sendTextMsg({
       content: text,
-      mentioned_list: [id],
+      mentioned_list: [adminId],
     });
     return;
   }
 
   const response = await sendMarkdownMsg(markdown);
+  const mentionedList = [adminId, ...memberIds];
   if (response.errcode === 0) {
     sendTextMsg({
       content: '',
-      mentioned_list :[id],
+      mentioned_list :[mentionedList],
     });
   }
 }
 
 exports.sendStatisticResult = async () => {
-  const foodList = await getTeamOrderList();
-  if (!foodList.length) {
+  const admin = utils.readAdminFile();
+  if (!admin || !admin.id || !admin.members) {
+    return;
+  }
+  const { id, members } = admin;
+  const res = await order.getTeamOrderList();
+  if (!res.length) {
     console.log('今日无人订餐！');
-    sendStatisticMsg({text: '今日无人订餐！'});
+    sendStatisticMsg({text: '今日无人订餐！'}, id);
   } else {
     try {
+      const foodList = res.map(i => i.food);
       const foodMap = getFoodCountMap(foodList);
-      sendStatisticMsg({markdown: formatStatisticData(foodMap, foodList.length)});
+      const memberIds = chooseMemberIds(res, members, id);
+      sendStatisticMsg({markdown: formatStatisticData(foodMap, foodList.length)}, id, memberIds);
     } catch (e) {
       console.log('error', e);
-      sendStatisticMsg({text: e});
+      sendStatisticMsg({text: e}, id);
     }
   }
 };

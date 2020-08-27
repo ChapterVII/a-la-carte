@@ -1,6 +1,6 @@
 
 const { sendTextMsg, sendMarkdownMsg } = require('../api/robot');
-const { getMenus } = require('../menu');
+const menu = require('../menu');
 
 const formatMenu2Markdown = (obj) => {
   let result = '### 今日晚餐 \n';
@@ -16,7 +16,7 @@ const formatMenu2Markdown = (obj) => {
 }
 
 exports.sendMenu = async () => {
-  const menus = await getMenus();
+  const menus = await menu.getMenus();
   if (!menus) return;
   const content = formatMenu2Markdown(menus);
   console.log('企业微信机器人发送菜单... \n', content);

@@ -1,10 +1,10 @@
-const {sendStatisticResult} = require('../src/chat/statistic');
-const { checkAdminConfigExist } = require('../src/utils');
+const statistic = require('../src/chat/statistic');
+const utils = require('../src/utils');
 
 module.exports = () => {
-  if (!checkAdminConfigExist()) {
+  if (!utils.checkAdminConfigExist()) {
     console.error('请配置管理员权限！');
     return;
   }
-  sendStatisticResult();
+  statistic.sendStatisticResult();
 };
