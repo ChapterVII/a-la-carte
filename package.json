@@ -1,10 +1,10 @@
 {
   "name": "@chaptervii/alacarte",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "团队点餐，统计的工具",
   "main": "main.js",
   "bin": {
-    "alacarte": "./bin/index.js"
+    "qiafan": "./bin/index.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

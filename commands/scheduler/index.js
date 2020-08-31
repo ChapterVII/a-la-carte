@@ -35,15 +35,19 @@ const CMD_MAP = {
 const format = (stdout) => iconv.decode(new Buffer(stdout, 'binary'), 'cp936');
 
 // 10:00进行订餐初次提醒
-exports.scheduleOrderNotify = () => {
-  process.exec(CMD_MAP.ORDER_NOTIFY, { encoding: 'binary' }, (error, stdout, stderr) => {
-    if (error || stderr) {
-      console.log(stderr ? format(stderr)  : '订餐提醒服务开启失败!');
-      return;
-    }
-    console.log(`已开启订餐提醒服务！提醒时间：每日${TIME_MAP.ORDER_NOTIFY}`);
-  });
-}
+exports.scheduleOrderNotify = () => new Promise((resolve) => {
+  {
+    process.exec(CMD_MAP.ORDER_NOTIFY, { encoding: 'binary' }, (error, stdout, stderr) => {
+      if (error || stderr) {
+        console.log(stderr ? format(stderr)  : '订餐提醒服务开启失败!');
+        resolve('failed');
+        return;
+      }
+      console.log(`已开启订餐提醒服务！提醒时间：每日${TIME_MAP.ORDER_NOTIFY}`);
+      resolve('successed');
+    });
+  }
+})
 
 exports.cancelOrderNotify = () => {
   process.exec(CMD_MAP.QUERY_ORDER_NOTIFY, { encoding: 'binary' }, (_error, _stdout, _stderr) => {
@@ -62,15 +66,17 @@ exports.cancelOrderNotify = () => {
 }
 
 // 14:00进行订餐二次提醒
-exports.scheduleOrderTwiceNotify = () => {
+exports.scheduleOrderTwiceNotify = () => new Promise((resolve) => {
   process.exec(CMD_MAP.ORDER_TWICE_NOTIFY, { encoding: 'binary' }, (error, stdout, stderr) => {
     if (error || stderr) {
       console.log(stderr ? format(stderr)  : '订餐二次提醒服务开启失败!');
+      resolve('failed');
       return;
     }
     console.log(`已开启订餐二次提醒服务！提醒时间：每日${TIME_MAP.ORDER_TWICE_NOTIFY}`);
+    resolve('successed');
   });
-}
+})
 
 exports.cancelOrderTwiceNotify = () => {
   process.exec(CMD_MAP.QUERY_ORDER_TWICE_NOTIFY, { encoding: 'binary' }, (_error, _stdout, _stderr) => {
@@ -89,15 +95,17 @@ exports.cancelOrderTwiceNotify = () => {
 }
 
 // 17:30进行订餐统计提醒
-exports.scheduleStatisticNotify = () => {
+exports.scheduleStatisticNotify = () => new Promise((resolve) => {
   process.exec(CMD_MAP.STATISTIC_NOTIFY, { encoding: 'binary' }, (error, stdout, stderr) => {
     if (error || stderr) {
       console.log(stderr ? format(stderr)  : '订餐统计通知服务开启失败!');
+      resolve('failed');
       return;
     }
     console.log(`已开启订餐统计通知服务！提醒时间：每日${TIME_MAP.STATISTIC_NOTIFY}`);
+    resolve('successed');
   });
-}
+})
 
 exports.cancelStatisticNotify = () => {
   process.exec(CMD_MAP.QUERY_STATISTIC_NOTIFY, { encoding: 'binary' }, (_error, _stdout, _stderr) => {

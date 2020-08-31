@@ -3,6 +3,7 @@ const ora = require('ora');
 const commonApi = require('../src/api/common');
 const order = require('../src/order');
 const utils = require('../src/utils');
+const notify = require('./notify');
 
 const promptInputInfo = () => new Promise(resolve => {
   const promptList = [{
@@ -106,11 +107,14 @@ module.exports = async () => {
       name: 'notify',
       default: true,
     }])
-    .then(answers => {
+    .then(async (answers) => {
       if (answers && answers.notify) {
         const { scheduleOrderNotify, scheduleOrderTwiceNotify } = require('./scheduler');
-        scheduleOrderNotify();
-        scheduleOrderTwiceNotify();
+        await scheduleOrderNotify();
+        await scheduleOrderTwiceNotify();
+        // 避免第一次调用notify 不弹出的问题
+        console.log('开启/测试订餐提醒');
+        notify();
       }
     })
     .catch(error => {
