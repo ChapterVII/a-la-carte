@@ -34,8 +34,7 @@ const createOrderCommand = async () => {
     })
     .then(async (answers) => {
       if (answers && answers.food) {
-        const [validFoodName] = answers.food.split('(');
-        await order.createOrder(validFoodName);
+        await order.createOrder(answers.food);
       }
     })
     .catch(error => {
@@ -62,6 +61,11 @@ module.exports = (arg = {}) => {
 
   if (arg.update) {
     updateOrder();
+    return;
+  }
+
+  if (arg.view) {
+    utils.getOrderResFood();
     return;
   }
 

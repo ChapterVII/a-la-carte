@@ -31,6 +31,7 @@ exports.createOrder = (food) => {
       return;
     }
     const { name, company } = config.order;
+    const [validFoodName] = food.split('(');
     
     const spinner = ora('正在下单...');
     spinner.start();
@@ -38,13 +39,13 @@ exports.createOrder = (food) => {
       name,
       company,
       bookDate: utils.today,
-      food,
+      food: validFoodName,
     });
     if (res && res.retCode === 0) {
-      console.log('res: ', res);
       utils.saveOrderFile({
         id: res.newId,
         date: utils.today,
+        food,
       });
       spinner.succeed(`订餐平台下单成功, 新增订单ID: ${res.newId}`);
     } else {

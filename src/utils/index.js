@@ -95,7 +95,7 @@ exports.saveOrderFile = (data) => {
   fs.writeFileSync(orderJsonPath, newData);
 };
 
-exports.readOrderFile = () => {
+const readOrderFile = () => {
   if (!fs.existsSync(orderJsonPath)) {
     return;
   }
@@ -104,6 +104,36 @@ exports.readOrderFile = () => {
     return JSON.parse(data);
   }
 };
+
+exports.readOrderFile = readOrderFile;
+
+exports.getOrderResFood = () => {
+  const order = readOrderFile();
+  if (!order || order.date !== today) {
+    console.log('今日未下单！');
+    return;
+  }
+  const menuMap = readMenuFile();
+  if (!menuMap) {
+    console.log('未获取到菜单文件！');
+    return;
+  }
+  
+  const resList = Object.keys(menuMap).filter(key => key !== 'date');
+  const orderFood = order.food;
+  for (let i = 0; i < resList.length; i++) {
+    const resName = resList[i];
+    const resMenu = menuMap[resName];
+    if (Array.isArray(resMenu) && resMenu.length) {
+      const target = resMenu.find(m => m.name === orderFood);
+      if (target) {
+        console.log(`今日订餐:\n${chalk.bgWhite.black(`【${(resName)}】\n`)}${orderFood}\n`);
+        return;
+      }
+    }
+  }
+  console.log(`今日订餐: ${orderFood}`);
+}
 
 exports.requiredConfigItems = ['company', 'dept', 'area'];
 

@@ -28,6 +28,7 @@ program
   .description('查看菜单并点餐')
   .option('--update', '修改今日订餐')
   .option('--delete', '删除今日订餐')
+  .option('--view', '查看今日订餐')
   .action(order);
 
 program
