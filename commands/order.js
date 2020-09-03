@@ -14,16 +14,16 @@ const createOrderCommand = async () => {
   if (result.status === 'ORDER') {
     console.log(chalk.yellow(result.msg));
   }
-  let menus;
-  if (utils.checkTodayMenuCached()) {
-    menus = utils.renderMenuChoice();
-  } else {
-    const spinner = ora('获取菜单...');
-    spinner.start();
-    const menuMap = await menu.getMenus();
-    menus = utils.renderMenuChoice(menuMap);
-    spinner.succeed();
+  
+  const spinner = ora('获取菜单...');
+  spinner.start();
+  const menuMap = await menu.getMenus();
+  if (!menuMap) {
+    spinner.failed('未获取到菜单');
+    return;
   }
+  spinner.succeed();
+  const menus = utils.renderMenuChoice(menuMap);
   inquirer
     .prompt({
       type: 'list',
