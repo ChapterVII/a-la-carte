@@ -7,7 +7,7 @@ const getTabUniqueId = async () => {
   if (res && res.dateList && res.dateList[0]) {
     const targetCalendarItem = res.dateList[0].calendarItemList;
     if (targetCalendarItem && targetCalendarItem[0] && targetCalendarItem[0].userTab) {
-      console.log('获取到的tabUniqueId >>>> ', targetCalendarItem[0].userTab.uniqueId);
+      // console.log('获取到的tabUniqueId >>>> ', targetCalendarItem[0].userTab.uniqueId);
       return targetCalendarItem[0].userTab.uniqueId;
     }
   }
@@ -18,7 +18,7 @@ const getTabUniqueId = async () => {
 const getRestaurantsList = async (tabUniqueId) => {
   const res = await menuApi.queryRestaurantsList(tabUniqueId);
   if (res && res.restaurantList && res.restaurantList.length) {
-    console.log('获取到的restaurantUniqueIds >>>> ', res.restaurantList.map(i => i.uniqueId));
+    // console.log('获取到的restaurantUniqueIds >>>> ', res.restaurantList.map(i => i.uniqueId));
     return res.restaurantList.map(i => i.uniqueId);
   }
   console.error('Failed, RestaurantsList Response>>>> \n', res);

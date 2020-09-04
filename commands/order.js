@@ -28,7 +28,7 @@ const createOrderCommand = async () => {
     .prompt({
       type: 'list',
       name: 'food',
-      message: 'Please choose your dish',
+      message: '请选择餐品',
       choices: menus,
       pageSize: 20,
     })
