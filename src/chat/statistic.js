@@ -70,7 +70,7 @@ const sendStatisticMsg = async (content, adminId, memberIds) => {
   }
 
   const response = await sendMarkdownMsg(markdown);
-  const mentionedList = [adminId, ...memberIds];
+  const mentionedList = memberIds.length < 3 ? memberIds : [adminId, ...memberIds];
   if (response.errcode === 0) {
     sendTextMsg({
       content: '',

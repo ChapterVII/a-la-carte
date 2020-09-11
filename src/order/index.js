@@ -78,7 +78,6 @@ exports.getTeamOrderList = async () => {
   if (!res || !res.length) {
     return [];
   }
-  console.log('getTeamOrderList: ', res);
   return res.map(i => ({
     food: i.food,
     name: i.name,
