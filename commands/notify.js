@@ -7,12 +7,12 @@ const utils = require('../src/utils');
 const menu = require('../src/menu');
 
 const orderNotifier = async (isTwice) => {
-  if (!utils.checkTodayNotifyIcon()) {
-    const spinner = ora('获取icon...');
-    spinner.start();
-    await notifyApi.getUnsplashImg();
-    spinner.succeed();
-  }
+  // if (!utils.checkTodayNotifyIcon()) {
+  //   const spinner = ora('获取icon...');
+  //   spinner.start();
+  //   await notifyApi.getUnsplashImg();
+  //   spinner.succeed();
+  // }
   notifier.notify(
     {
       title: '订餐提醒',

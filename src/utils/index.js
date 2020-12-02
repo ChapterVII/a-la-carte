@@ -187,7 +187,7 @@ exports.readAdminFile = () => {
   }
 };
 
-const defaultMotifyIconPath = path.resolve(__dirname, `../../images/notify-icon.jpg`);
+const defaultNotifyIconPath = path.resolve(__dirname, `../../images/notify-icon.jpg`);
 const notifyIconName = `notify-icon-${today}.jpg`;
 const notifyIconPath = path.resolve(__dirname, `../../images/${notifyIconName}`);
 
@@ -225,10 +225,10 @@ const checkTodayNotifyIcon = () => {
 exports.checkTodayNotifyIcon = checkTodayNotifyIcon;
 
 exports.getValidNotifyIconPath = () => {
-  if (checkTodayNotifyIcon()) {
-    return notifyIconPath;
-  }
-  return defaultMotifyIconPath;
+  // if (checkTodayNotifyIcon()) {
+  //   return notifyIconPath;
+  // }
+  return defaultNotifyIconPath;
 };
 
 const getCommonHeaders = () => {
