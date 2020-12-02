@@ -52,7 +52,7 @@ exports.checkTodayMenuCached = () => {
 
 exports.getMenuList = () => {
   const menuMap = readMenuFile();
-  if (!menuMap) return;
+  if (!menuMap || menuMap.date !== today) return;
   const menuList = [];
   Object.keys(menuMap).forEach(key => {
     if (key !== 'date') {

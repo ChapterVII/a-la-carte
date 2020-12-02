@@ -4,6 +4,7 @@ const path = require('path');
 const order = require('./order');
 const notifyApi = require('../src/api/notify');
 const utils = require('../src/utils');
+const menu = require('../src/menu');
 
 const orderNotifier = async (isTwice) => {
   if (!utils.checkTodayNotifyIcon()) {
@@ -27,6 +28,8 @@ const orderNotifier = async (isTwice) => {
       }
       if (data === 'activate' || data === 'start') {
         order();
+      } else if (utils.checkAdminConfigExist()) {
+        menu.getMenus();
       }
     }
   );
