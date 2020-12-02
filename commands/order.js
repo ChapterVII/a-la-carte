@@ -5,7 +5,7 @@ const order  = require('../src/order');
 const menu = require('../src/menu');
 const utils = require('../src/utils');
 
-const createOrderCommand = async () => {
+const createOrderCommand = async (isUpdate) => {
   const result = await utils.mayIOrder();
   if (!result.status) {
     console.error(chalk.red(result.msg));
@@ -34,19 +34,19 @@ const createOrderCommand = async () => {
     })
     .then(async (answers) => {
       if (answers && answers.food) {
-        await order.createOrder(answers.food);
+        if (!isUpdate) {
+          order.createOrder(answers.food);
+          return;
+        }
+        const res = await order.deleteOrder();
+        if (res === true) {
+          order.createOrder(answers.food);
+        }
       }
     })
     .catch(error => {
       console.error('error: ', error);
     })
-}
-
-const updateOrder = async () => {
-  const res = await order.deleteOrder();
-  if (res === true) {
-    createOrderCommand();
-  }
 }
 
 module.exports = (arg = {}) => {
@@ -60,7 +60,7 @@ module.exports = (arg = {}) => {
   }
 
   if (arg.update) {
-    updateOrder();
+    createOrderCommand(true);
     return;
   }
 
