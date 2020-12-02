@@ -85,7 +85,7 @@ module.exports = async () => {
   if (!selectInfo) {
     return;
   }
-  const { cookie, ...rest } = userConfig;
+  const { notifyTwiceTime, cookie, ...rest } = userConfig;
   const obj = {
     menu: {
       cookie,
@@ -96,7 +96,8 @@ module.exports = async () => {
       ...rest,
       ...selectInfo,
       version: orderConfig.version,
-    }
+    },
+    notifyTwiceTime,
   };
   utils.saveConfigFile(obj);
 

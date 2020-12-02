@@ -1,6 +1,7 @@
 const path = require('path');
 const process = require('child_process');
-const iconv = require('iconv-lite')
+const iconv = require('iconv-lite');
+const utils = require('../../src/utils');
 
 const notifyOrderPath = path.resolve(__dirname, './notifyOnce.js');
 const twiceNotifyOrderPath = path.resolve(__dirname, './notifyTwice.js');
@@ -10,7 +11,7 @@ const notifyStatisticPath = path.resolve(__dirname, './statistic.js');
 
 const TIME_MAP = {
   ORDER_NOTIFY: '10:30:00',
-  ORDER_TWICE_NOTIFY: '13:45:00',
+  ORDER_TWICE_NOTIFY: '11:00:00',
   STATISTIC_NOTIFY: '17:30:00',
 }
 
@@ -36,17 +37,15 @@ const format = (stdout) => iconv.decode(new Buffer(stdout, 'binary'), 'cp936');
 
 // 10:00进行订餐初次提醒
 exports.scheduleOrderNotify = () => new Promise((resolve) => {
-  {
-    process.exec(CMD_MAP.ORDER_NOTIFY, { encoding: 'binary' }, (error, stdout, stderr) => {
-      if (error || stderr) {
-        console.log(stderr ? format(stderr)  : '订餐提醒服务开启失败!');
-        resolve('failed');
-        return;
-      }
-      console.log(`已开启订餐提醒服务！提醒时间：每日${TIME_MAP.ORDER_NOTIFY}`);
-      resolve('successed');
-    });
-  }
+  process.exec(CMD_MAP.ORDER_NOTIFY, { encoding: 'binary' }, (error, stdout, stderr) => {
+    if (error || stderr) {
+      console.log(stderr ? format(stderr)  : '订餐提醒服务开启失败!');
+      resolve('failed');
+      return;
+    }
+    console.log(`已开启订餐提醒服务！提醒时间：每日${TIME_MAP.ORDER_NOTIFY}`);
+    resolve('successed');
+  });
 })
 
 exports.cancelOrderNotify = () => {
@@ -67,13 +66,15 @@ exports.cancelOrderNotify = () => {
 
 // 14:00进行订餐二次提醒
 exports.scheduleOrderTwiceNotify = () => new Promise((resolve) => {
-  process.exec(CMD_MAP.ORDER_TWICE_NOTIFY, { encoding: 'binary' }, (error, stdout, stderr) => {
+  const time = utils.getNotifyTwiceTime();
+  const CMD = `schtasks /create /tn ${TASK_MAP.ORDER_TWICE_NOTIFY} /tr "node ${twiceNotifyOrderPath}" /sc daily /st ${time} /f`;
+  process.exec(CMD, { encoding: 'binary' }, (error, stdout, stderr) => {
     if (error || stderr) {
       console.log(stderr ? format(stderr)  : '订餐二次提醒服务开启失败!');
       resolve('failed');
       return;
     }
-    console.log(`已开启订餐二次提醒服务！提醒时间：每日${TIME_MAP.ORDER_TWICE_NOTIFY}`);
+    console.log(`已开启订餐二次提醒服务！提醒时间：每日${time}`);
     resolve('successed');
   });
 })
