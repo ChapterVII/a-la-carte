@@ -303,7 +303,7 @@ exports.mayIOrder = async () => {
 }
 
 exports.getNotifyTwiceTime = () => {
-  const config = utils.readConfigFile();
+  const config = readConfigFile();
   if (!config || !config.notifyTwiceTime) {
     return '11:00:00';
   }
