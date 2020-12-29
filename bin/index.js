@@ -4,6 +4,7 @@ const initial = require('../commands/initial');
 const admin = require('../commands/admin');
 const order = require('../commands/order');
 const statistic = require('../commands/statistic');
+const check = require('../commands/check');
 const scheduler = require('../commands/scheduler');
 const notify = require('../commands/notify');
 const server = require('../commands/server');
@@ -38,6 +39,11 @@ program
   .action(statistic);
 
 program
+  .command('check')
+  .description('核对点餐与订餐人数并提醒补餐')
+  .action(check);
+
+program
   .command('server')
   .description('同步配置信息服务')
   .action(server);
@@ -50,6 +56,7 @@ program
   .option('--disable', '关闭订餐通知')
   .option('--twice', '订餐二次提醒')
   .option('--statistic', '订餐统计定时发送')
+  .option('--check', '核对补餐定时发送')
   .action((arg) => {
     if (arg.twice) {
       if (arg.enable) {
@@ -75,6 +82,20 @@ program
       statistic();
       return;
     }
+
+    if (arg.check) {
+      if (arg.enable) {
+        scheduler.scheduleCheckNotify();
+        return;
+      }
+      if (arg.disable) {
+        scheduler.cancelCheckNotify();
+        return;
+      }
+      check();
+      return;
+    }
+
     if (arg.enable) {
       scheduler.scheduleOrderNotify();
       scheduler.scheduleOrderTwiceNotify();

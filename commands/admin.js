@@ -22,6 +22,14 @@ const promptInputInfo = () => new Promise(resolve => {
     type: 'input',
     message: 'Please enter your robot',
     name: 'robot',
+  },{
+    type: 'input',
+    message: 'Please enter clientId',
+    name: 'clientId',
+  },{
+    type: 'input',
+    message: 'Please enter clientSecret',
+    name: 'clientSecret',
   // },{
   //   type: 'input',
   //   message: 'Please enter team members',
@@ -105,13 +113,24 @@ module.exports = async () => {
     .prompt([{
       type: 'confirm',
       message: '是否开启订餐统计自动推送？',
-      name: 'notify',
+      name: 'statistic',
+      default: true,
+    }, {
+      type: 'confirm',
+      message: '是否开启核对补餐自动推送？',
+      name: 'check',
       default: true,
     }])
-    .then(answers => {
-      if (answers && answers.notify) {
-        const { scheduleStatisticNotify } = require('./scheduler');
-        scheduleStatisticNotify();
+    .then(async answers => {
+      if (answers) {
+        const { scheduleStatisticNotify, scheduleCheckNotify } = require('./scheduler');
+        if (answers.statistic) {
+          await scheduleStatisticNotify();
+        }
+        if (answers.check) {
+          await scheduleCheckNotify();
+        }
+        console.log('admin 权限配置成功~！');
       }
     })
     .catch(error => {

@@ -7,6 +7,7 @@ const PATH_MAP = {
   CalendaritemsList: 'calendaritems/list',
   RestaurantsList: 'restaurants/list',
   RestaurantsDetail: 'restaurants/show',
+  OrderShow: 'orders/show',
 };
 
 exports.queryCalendaritemsList = () => {
@@ -47,3 +48,21 @@ exports.queryRestaurantDetail = (data) => {
     },
   });
 }
+
+exports.orderShow = (uniqueId) => {
+  const admin = utils.readAdminFile();
+  if (!admin) return;
+  return axios({
+    method: "get",
+    headers: utils.getCommonHeaders(),
+    url: `${BaseUrl}${PATH_MAP.OrderShow}`,
+    params: {
+      uniqueId,
+      type: 'CORP_ORDER',
+      progressMarkdownSupport: true,
+      x: new Date().getTime(),
+      client_id: admin.clientId,
+      client_secret: admin.clientSecret,
+    },
+  });
+};

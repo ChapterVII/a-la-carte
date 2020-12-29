@@ -2,10 +2,10 @@ const { sendTextMsg, sendMarkdownMsg } = require('../api/robot');
 const utils = require('../utils');
 const order = require('../order');
 
-const getFoodCountMap = (foodList) => {
-  const menuList = utils.getMenuList();
+const getFoodCountMap = async (foodList) => {
+  const menuList = await utils.getMenuList();
   const foodMap = {};
-  foodList.forEach(i => {
+  menuList.length && foodList.forEach(i => {
     const menu = menuList.find(m => m.includes(i));
     if (!menu) {
       console.error(`not found matched food by foodName "${i}"`);
@@ -61,22 +61,22 @@ const chooseMemberIds = (orderList, members, adminId) => {
 
 const sendStatisticMsg = async (content, adminId, memberIds) => {
   const { markdown, text } = content;
-  if (!markdown) {
-    sendTextMsg({
-      content: text,
-      mentioned_list: [adminId],
-    });
-    return;
-  }
-
-  const response = await sendMarkdownMsg(markdown);
-  const mentionedList = memberIds.length < 3 ? memberIds : [adminId, ...memberIds];
-  if (response.errcode === 0) {
-    sendTextMsg({
-      content: '',
-      mentioned_list :[mentionedList],
-    });
-  }
+  // if (!markdown) {
+  //   sendTextMsg({
+  //     content: text,
+  //     mentioned_list: [adminId],
+  //   });
+  //   return;
+  // }
+  console.log(content.markdown);
+  // const response = await sendMarkdownMsg(markdown);
+  // const mentionedList = memberIds.length < 3 ? memberIds : [adminId, ...memberIds];
+  // if (response.errcode === 0) {
+  //   sendTextMsg({
+  //     content: '',
+  //     mentioned_list : memberIds,
+  //   });
+  // }
 }
 
 exports.sendStatisticResult = async () => {
@@ -92,7 +92,7 @@ exports.sendStatisticResult = async () => {
   } else {
     try {
       const foodList = res.map(i => i.food);
-      const foodMap = getFoodCountMap(foodList);
+      const foodMap = await getFoodCountMap(foodList);
       const memberIds = chooseMemberIds(res, members, id);
       sendStatisticMsg({markdown: formatStatisticData(foodMap, foodList.length)}, id, memberIds);
     } catch (e) {

@@ -71,15 +71,12 @@ const queryOrderList = () => {
   });
 };
 
+exports.queryOrderList = queryOrderList;
+
 exports.queryTeamOrderList = async () => {
   const res = await queryOrderList();
   if (res && res.list && res.list.length) {
-    const admin = utils.readAdminFile();
-    if (admin && admin.members) {
-      const { members, dept} = admin;
-      const names = members.map(m => m.name);
-      return res.list.filter(i => Number(i.dept) === dept && names.includes(i.name));
-    }
+    return utils.filterTeamOrder(res.list);
   }
   console.error('Get Team OrderList Faild!');
   return [];

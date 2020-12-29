@@ -6,6 +6,7 @@ const utils = require('../../src/utils');
 const notifyOrderPath = path.resolve(__dirname, './notifyOnce.js');
 const twiceNotifyOrderPath = path.resolve(__dirname, './notifyTwice.js');
 const notifyStatisticPath = path.resolve(__dirname, './statistic.js');
+const notifyCheckPath = path.resolve(__dirname, './check.js');
 
 
 
@@ -13,12 +14,14 @@ const TIME_MAP = {
   ORDER_NOTIFY: '10:30:00',
   ORDER_TWICE_NOTIFY: '11:00:00',
   STATISTIC_NOTIFY: '17:30:00',
+  CHECK_NOTIFY: '13:45:00',
 }
 
 const TASK_MAP = {
   ORDER_NOTIFY: 'alacarte-order-task',
   ORDER_TWICE_NOTIFY: 'alacarte-order-twice-task',
-  STATISTIC_NOTIFY: 'alacarte-statistic-task'
+  STATISTIC_NOTIFY: 'alacarte-statistic-task',
+  CHECK_NOTIFY: 'alacarte-check-task',
 }
 
 const CMD_MAP = {
@@ -31,6 +34,9 @@ const CMD_MAP = {
   STATISTIC_NOTIFY: `schtasks /create /tn ${TASK_MAP.STATISTIC_NOTIFY} /tr "node ${notifyStatisticPath}" /sc daily /st ${TIME_MAP.STATISTIC_NOTIFY} /f`,
   QUERY_STATISTIC_NOTIFY: `schtasks /query /tn ${TASK_MAP.STATISTIC_NOTIFY} /fo LIST`,
   CANCEL_STATISTIC_NOTIFY: `schtasks /delete /tn ${TASK_MAP.STATISTIC_NOTIFY} /f`,
+  CHECK_NOTIFY: `schtasks /create /tn ${TASK_MAP.CHECK_NOTIFY} /tr "node ${notifyCheckPath}" /sc daily /st ${TIME_MAP.CHECK_NOTIFY} /f`,
+  QUERY_CHECK_NOTIFY: `schtasks /query /tn ${TASK_MAP.CHECK_NOTIFY} /fo LIST`,
+  CANCEL_CHECK_NOTIFY: `schtasks /delete /tn ${TASK_MAP.CHECK_NOTIFY} /f`,
 };
 
 const format = (stdout) => iconv.decode(new Buffer(stdout, 'binary'), 'cp936');
@@ -120,6 +126,35 @@ exports.cancelStatisticNotify = () => {
         return;
       }
       console.log('已成功关闭订餐统计通知服务！');
+    });
+  });
+}
+
+// 13:45进行核对补餐提醒
+exports.scheduleCheckNotify = () => new Promise((resolve) => {
+  process.exec(CMD_MAP.CHECK_NOTIFY, { encoding: 'binary' }, (error, stdout, stderr) => {
+    if (error || stderr) {
+      console.log(stderr ? format(stderr)  : '核对补餐通知服务开启失败!');
+      resolve('failed');
+      return;
+    }
+    console.log(`已开启核对补餐通知服务！提醒时间：每日${TIME_MAP.CHECK_NOTIFY}`);
+    resolve('successed');
+  });
+})
+
+exports.cancelCheckNotify = () => {
+  process.exec(CMD_MAP.QUERY_CHECK_NOTIFY, { encoding: 'binary' }, (_error, _stdout, _stderr) => {
+    if (_error || _stderr) {
+      console.log(_stderr ? format(_stderr)  : '核对补餐通知服务获取失败!');
+      return;
+    }
+    process.exec(CMD_MAP.CANCEL_CHECK_NOTIFY, { encoding: 'binary' }, (error, stdout, stderr) => {
+      if (error || stderr) {
+        console.log(stderr ? format(stderr)  : '关闭核对补餐通知服务失败!');
+        return;
+      }
+      console.log('已成功关闭核对补餐通知服务！');
     });
   });
 }

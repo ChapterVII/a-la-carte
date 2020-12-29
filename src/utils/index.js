@@ -4,6 +4,7 @@ const moment = require('moment');
 const inquirer = require('inquirer');
 const chalk = require('chalk');
 const { queryCalendaritemsList } = require('../api/menu');
+const { getMenus } = require('../menu');
 
 const dbPath = path.resolve(__dirname, '../../db');
 
@@ -50,9 +51,14 @@ exports.checkTodayMenuCached = () => {
   return false;
 }
 
-exports.getMenuList = () => {
-  const menuMap = readMenuFile();
-  if (!menuMap || menuMap.date !== today) return;
+exports.getMenuList = async () => {
+  let menuMap = readMenuFile();
+  if (!menuMap || menuMap.date !== today) {
+    if (!checkAdminConfigExist()) {
+      return [];
+    }
+    menuMap = await getMenus();
+  }
   const menuList = [];
   Object.keys(menuMap).forEach(key => {
     if (key !== 'date') {
@@ -166,7 +172,8 @@ exports.readConfigFile = readConfigFile;
 
 const adminPath = path.resolve(__dirname, '../../alacarte.admin.json');
 exports.adminPath = adminPath;
-exports.checkAdminConfigExist = () => fs.existsSync(adminPath);
+const checkAdminConfigExist = () => fs.existsSync(adminPath);
+exports.checkAdminConfigExist = checkAdminConfigExist;
 
 exports.saveAdminFile = (data) => {
   const newData = JSON.stringify(data, '', '\t');
@@ -177,7 +184,7 @@ exports.saveAdminFile = (data) => {
   })
 };
 
-exports.readAdminFile = () => {
+const readAdminFile = () => {
   if (!fs.existsSync(adminPath)) {
     return;
   }
@@ -186,6 +193,8 @@ exports.readAdminFile = () => {
     return JSON.parse(data);
   }
 };
+
+exports.readAdminFile = readAdminFile;
 
 const defaultNotifyIconPath = path.resolve(__dirname, `../../images/notify-icon.jpg`);
 const notifyIconName = `notify-icon-${today}.jpg`;
@@ -308,4 +317,14 @@ exports.getNotifyTwiceTime = () => {
     return '11:00:00';
   }
   return config.notifyTwiceTime;
+}
+
+exports.filterTeamOrder = (orderList) => {
+  const admin = readAdminFile();
+  if (admin && admin.members && Array.isArray(orderList)) {
+    const { members, dept} = admin;
+    const names = members.map(m => m.name);
+    return orderList.filter(i => Number(i.dept) === dept && names.includes(i.name));
+  }
+  return [];
 }

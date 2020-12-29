@@ -2,17 +2,31 @@ const axios = require('../http');
 const menuApi = require('../api/menu');
 const utils = require('../utils');
 
-const getTabUniqueId = async () => {
+const getCalendarItem = async () => {
   const res = await menuApi.queryCalendaritemsList();
   if (res && res.dateList && res.dateList[0]) {
     const targetCalendarItem = res.dateList[0].calendarItemList;
-    if (targetCalendarItem && targetCalendarItem[0] && targetCalendarItem[0].userTab) {
+    if (targetCalendarItem && targetCalendarItem[0]) {
       // console.log('获取到的tabUniqueId >>>> ', targetCalendarItem[0].userTab.uniqueId);
-      return targetCalendarItem[0].userTab.uniqueId;
+      return targetCalendarItem[0];
     }
   }
   console.error('Failed, CalendaritemsList Response>>>> \n', res);
   return;
+}
+
+const getTabUniqueId = async () => {
+  const item = await getCalendarItem();
+  return item.userTab ? item.userTab.uniqueId : '';
+}
+
+const getUniqueId = async () => {
+  const item = await getCalendarItem();
+  if (item.status === 'AVAILABLE') {
+    console.log('还未下单！');
+    return;
+  }
+  return item.corpOrderUser ? item.corpOrderUser.uniqueId : '';
 }
 
 const getRestaurantsList = async (tabUniqueId) => {
@@ -75,4 +89,20 @@ exports.getMenus = async () => {
     ...menuMap,
   });
   return menuMap;
+}
+
+exports.getOrderNum = async () => {
+  const uniqueId = await getUniqueId();
+  if (!uniqueId) return;
+  const res = await menuApi.orderShow(uniqueId);
+  let orderNum = 0;
+  if (Array.isArray(res.restaurantItemList) && res.restaurantItemList.length) {
+    res.restaurantItemList.forEach(i => {
+      const dish = i.dishItemList;
+      Array.isArray(dish) && dish.forEach(d => {
+        orderNum += d.count;
+      })
+    });
+  }
+  return orderNum;
 }
